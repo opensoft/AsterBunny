@@ -1,0 +1,35 @@
+{
+    "hash": "7efda59960810cd7c4c0d4c3e4cbb86c",
+    "packages": [
+        {
+            "package": "marcelog/pami",
+            "version": "dev-master",
+            "source-reference": "master"
+        },
+        {
+            "package": "pear-log4php/Apache_log4php",
+            "version": "2.2.1"
+        },
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "source-reference": "8d58af16c425977018293eb0a1570c9629b37994",
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "source-reference": "8d58af16c425977018293eb0a1570c9629b37994"
+        },
+        {
+            "package": "videlalvaro/php-amqplib",
+            "version": "dev-master",
+            "source-reference": "d4fb5348f2118e9fbc00aa7461e3bad79bf42d6c"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ]
+}
