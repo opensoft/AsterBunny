@@ -8,7 +8,7 @@ Install
 
 Clone the repo:
 
-   $ git clone https://github.com/opensoft/AsterBunny.git
+    $ git clone https://github.com/opensoft/AsterBunny.git
 
 Now install dependencies with composer
 
