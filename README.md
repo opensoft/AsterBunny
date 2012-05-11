@@ -19,7 +19,7 @@ Now install dependencies with composer
 Usage
 =====
 
-The CLI tool is located at `bin/listen` and has a lot of configuration options relating to specifying hostnames, ports,
+The CLI tool is located at `bin/asterbunny` and has a lot of configuration options relating to specifying hostnames, ports,
 usernames, and passwords for Asterisk connections and RabbitMQ servers.
 
 It's recommended to run the following to learn the configuration set, and defaults
