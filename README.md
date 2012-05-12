@@ -8,13 +8,16 @@ Install
 
 Clone the repo:
 
-    $ git clone https://github.com/opensoft/AsterBunny.git
+```bash
+git clone https://github.com/opensoft/AsterBunny.git
+```
 
 Now install dependencies with composer
 
-    $ curl http://getcomposer.org/installer | php
-    $ php composer.phar install
-
+```bash
+curl http://getcomposer.org/installer | php
+php composer.phar install
+```
 
 Usage
 =====
@@ -24,14 +27,18 @@ usernames, and passwords for Asterisk connections and RabbitMQ servers.
 
 It's recommended to run the following to learn the configuration set, and defaults
 
-    $ ./bin/asterbunny listen --help
+```bash
+./bin/asterbunny listen --help
+```
 
 Logging
 =======
 
 A default log4php configuration file is included with this tool.
 
-    $ cp log4php.xml.dist log4php.xml
+```bash
+cp log4php.xml.dist log4php.xml
+```
 
 Configure logging by editing the file according to instructions found [here](http://logging.apache.org/log4php/docs/configuration.html)
 
