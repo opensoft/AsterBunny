@@ -36,9 +36,7 @@ Logging
 
 A default log4php configuration file is included with this tool.
 
-```bash
-cp log4php.xml.dist log4php.xml
-```
+    $ cp log4php.dist.xml log4php.xml
 
 Configure logging by editing the file according to instructions found [here](http://logging.apache.org/log4php/docs/configuration.html)
 

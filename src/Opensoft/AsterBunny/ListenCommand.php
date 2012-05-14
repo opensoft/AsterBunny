@@ -30,12 +30,15 @@ class ListenCommand extends Command
      */
     protected function configure()
     {
+        $log4phpPath = is_file(__DIR__.'/../../../log4php.xml')
+            ? realpath(__DIR__.'/../../../log4php.xml')
+            : realpath(__DIR__.'/../../../log4php.dist.xml');
+
         $this
             ->setName('listen')
             ->setDescription('Begin listening for AMI events and sending them to RabbitMQ')
-            ->addOption('duration', 'd', InputOption::VALUE_OPTIONAL, 'Listen for a number of seconds, then terminate the connection', 12 * 3600)
 
-            ->addOption('log4php-configuration', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', realpath(__DIR__.'/../../../log4php.xml'))
+            ->addOption('log4php-configuration', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', $log4phpPath)
 
             ->addOption('ami-host', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', 'localhost')
             ->addOption('ami-port', null, InputOption::VALUE_OPTIONAL, 'Asterisk port', 5038)
@@ -86,24 +89,15 @@ EOF
 
 
         $output->write("<comment>Opening rabbitmq connection... </comment>");
-        $conn = new AMQPConnection(
+        $amqpConn = new AMQPConnection(
             $input->getOption('rabbit-host'),
             $input->getOption('rabbit-port'),
             $input->getOption('rabbit-username'),
             $input->getOption('rabbit-password'),
             $input->getOption('rabbit-vhost')
         );
-        $ch = $conn->channel();
-
+        $ch = $amqpConn->channel();
         $exchange = $input->getOption('rabbit-exchange-name');
-
-        /*
-            name: $exchange
-            type: fanout
-            passive: false
-            durable: true // the exchange will survive server restarts
-            auto_delete: false //the exchange won't be deleted once the channel is closed.
-        */
         $ch->exchange_declare($exchange, 'fanout', false, true, false);
 
         $output->writeln('<info>done</info>');
@@ -113,9 +107,14 @@ EOF
 
         $pamiClient->registerEventListener(function(EventMessage $event) use ($output, $ch, $exchange, &$counter, &$i) {
             // Send to RabbitMQ
+
             $msg = new AMQPMessage(
                 json_encode($event->getKeys()),
-                array('content_type' => 'application/json', 'delivery_mode' => 2)
+                array(
+                    'content_type' => 'application/json',
+                    'timestamp' => time(),
+                    'delivery_mode' => 2
+                )
             );
             $ch->basic_publish($msg, $exchange);
 
@@ -127,7 +126,7 @@ EOF
         });
 
 
-        $closer = function($autoExit = true) use ($pamiClient, $conn, $ch, $output) {
+        $closer = function($autoExit = true) use ($pamiClient, $amqpConn, $ch, $output) {
             $output->writeln('');
             $output->write('<comment>Closing ami connection... </comment>');
             $pamiClient->close(); // send logoff and close the connection.
@@ -135,7 +134,7 @@ EOF
 
             $output->write('<comment>Closing rabbitmq connection... </comment>');
             $ch->close();
-            $conn->close();
+            $amqpConn->close();
             $output->writeln("<info>done</info>");
 
             if ($autoExit) {
@@ -147,9 +146,7 @@ EOF
             pcntl_signal(\SIGINT, $closer);
             pcntl_signal(\SIGTERM, $closer);
 
-            $time = time();
-
-            while ((time() - $time) <= $input->getOption('duration')) {
+            while (true) {
                 usleep(1000); // 1ms delay
 
                 $i++;
@@ -160,7 +157,7 @@ EOF
                     $i = 0;
 
                     // for every 10 seconds that go by, send a ping/pong event to the asterisk server
-                    // if send times out, it'll throw an exception, which will end this script... supervisor will restart
+                    // if send times out, it'll throw an exception, which will end this script... supervisor should restart
                     $pong = $pamiClient->send(new \PAMI\Message\Action\PingAction());
 
                     if ('Success' == $pong->getKey('response')) {
