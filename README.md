@@ -31,6 +31,35 @@ It's recommended to run the following to learn the configuration set, and defaul
 ./bin/asterbunny listen --help
 ```
 
+Message Sending
+===============
+
+All asterisk events emitted by the Asterisk AMI interface are encoded as JSON and then sent to a configured RabbitMQ server.
+
+Specifically, http://www.voip-info.org/wiki/view/asterisk+manager+events are:
+
+  1. Keys are converted to lowercase
+  2. The message is converted to JSON
+
+And then submitted to the configured exchange with the `fanout` exchange type
+
+#### Example
+
+```json
+{
+    "event": "Agentlogoff"
+    "agent": "<agent>"
+    "logintime": "<logintime>"
+    "uniqueid": "<uniqueid>"
+}
+```
+
+Message headers are as follows:
+
+ * `timestamp` => The unix timestamp of when the event occured as seen by AsterBunny
+ * `content_type` => `application\json`
+ * `delivery_mode` => `2` - Indicates that the message should be persisted by RabbitMQ
+
 Logging
 =======
 
