@@ -47,9 +47,9 @@ And then submitted to the configured exchange with the `fanout` exchange type
 
 ```json
 {
-    "event": "Agentlogoff"
-    "agent": "<agent>"
-    "logintime": "<logintime>"
+    "event": "Agentlogoff",
+    "agent": "<agent>",
+    "logintime": "<logintime>",
     "uniqueid": "<uniqueid>"
 }
 ```
