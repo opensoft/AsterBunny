@@ -146,28 +146,37 @@ EOF
             pcntl_signal(\SIGTERM, $closer);
 
             while (true) {
-                usleep(1000); // 1ms delay
+                try {
+                    usleep(1000); // 1ms delay
 
-                $i++;
+                    $i++;
 
-                if ($i == 10000) { // show some feedback every 10000 iterations or so, roughly every 10 seconds if nothing is processed
-                    $counter++;
-                    $output->write(sprintf(" >> <comment>Waiting for events... [%d seconds]</comment> <info>Ping...</info>", $counter * 10));
-                    $i = 0;
+                    if ($i == 10000) { // show some feedback every 10000 iterations or so, roughly every 10 seconds if nothing is processed
+                        $counter++;
+                        $output->write(sprintf(" >> <comment>Waiting for events... [%d seconds]</comment> <info>Ping...</info>", $counter * 10));
+                        $i = 0;
 
-                    // for every 10 seconds that go by, send a ping/pong event to the asterisk server
-                    // if send times out, it'll throw an exception, which will end this script... supervisor should restart
-                    $pong = $pamiClient->send(new \PAMI\Message\Action\PingAction());
+                        // for every 10 seconds that go by, send a ping/pong event to the asterisk server
+                        // if send times out, it'll throw an exception, which will end this script... supervisor should restart
+                        $pong = $pamiClient->send(new \PAMI\Message\Action\PingAction());
 
-                    if ('Success' == $pong->getKey('response')) {
-                        $output->writeln('<info>Pong</info>');
-                    } else {
-                        $output->writeln('<error>No pong...</error>');
-                        print_r($pong);
+                        if ('Success' == $pong->getKey('response')) {
+                            $output->writeln('<info>Pong</info>');
+                        } else {
+                            $output->writeln('<error>No pong...</error>');
+                            print_r($pong);
+                        }
                     }
-                }
 
-                $pamiClient->process();
+                    $pamiClient->process();
+                } catch (\Exception $e) {
+
+                    // try to close any connections
+                    $closer(false);
+
+                    // rethrow the exception
+                    throw $e;
+                }
             }
         }
 
