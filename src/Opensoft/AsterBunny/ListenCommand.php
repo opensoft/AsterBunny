@@ -15,6 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use PAMI\Client\Impl\ClientImpl;
+use PAMI\Message\Response\ResponseMessage;
 use PAMI\Message\Event\EventMessage;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -153,18 +154,26 @@ EOF
 
                     if ($i == 10000) { // show some feedback every 10000 iterations or so, roughly every 10 seconds if nothing is processed
                         $counter++;
-                        $output->write(sprintf(" >> <comment>Waiting for events... [%d seconds]</comment> <info>Ping...</info>", $counter * 10));
+                        $output->writeln(sprintf(" >> <comment>Waiting for events... [%d seconds]</comment> <info>Ping...</info>", $counter * 10));
                         $i = 0;
 
                         // for every 10 seconds that go by, send a ping/pong event to the asterisk server
                         // if send times out, it'll throw an exception, which will end this script... supervisor should restart
+                        /** @var ResponseMessage $pong  */
                         $pong = $pamiClient->send(new \PAMI\Message\Action\PingAction());
 
                         if ('Success' == $pong->getKey('response')) {
-                            $output->writeln('<info>Pong</info>');
-                        } else {
-                            $output->writeln('<error>No pong...</error>');
-                            print_r($pong);
+                            // Send the pong event onto RabbitMQ.  This has a faux keep-alive effect on the RabbitMQ connection
+                            $msg = new AMQPMessage(
+                                json_encode($pong->getKeys()),
+                                array(
+                                    'content_type' => 'application/json',
+                                    'timestamp' => time(),
+                                    'delivery_mode' => 2
+                                )
+                            );
+                            $ch->basic_publish($msg, $exchange);
+                            $output->writeln(sprintf(" >> <comment>[%s] [%s bytes]</comment> <info>%s</info>", date('Y-m-d G:i:s') . substr((string)microtime(), 1, 8), memory_get_usage(), 'Pong'));
                         }
                     }
 
