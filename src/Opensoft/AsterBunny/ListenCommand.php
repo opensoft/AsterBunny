@@ -34,6 +34,8 @@ class ListenCommand extends Command
             ? realpath(__DIR__.'/../../../log4php.xml')
             : realpath(__DIR__.'/../../../log4php.dist.xml');
 
+        $optionDefaults = @parse_ini_file(__DIR__ . '/Resources/Config/settings.ini');
+        
         $this
             ->setName('listen')
             ->setDescription('Begin listening for AMI events and sending them to RabbitMQ')
@@ -47,22 +49,15 @@ class ListenCommand extends Command
             ->addOption('ami-connect-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk connect timeout', 10000)
             ->addOption('ami-read-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk read timeout', 10000)
 
-
             ->addOption('rabbit-host', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ host', 'localhost')
             ->addOption('rabbit-port', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ port', 5672)
             ->addOption('rabbit-username', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ username', 'guest')
             ->addOption('rabbit-password', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ password', 'guest')
             ->addOption('rabbit-vhost', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ vhost', '/')
 
-
             ->addOption('rabbit-exchange-name', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ exchange name', 'asterbunny.events')
 
-            ->setHelp(<<<EOF
-
-The <info>listen</info> command listens to a configured Asterisk server.
-
-EOF
-        );
+            ->setHelp("The <info>listen</info> command listens to a configured Asterisk server.");
     }
 
     /**
