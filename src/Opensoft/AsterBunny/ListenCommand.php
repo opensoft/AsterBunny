@@ -91,7 +91,7 @@ class ListenCommand extends Command
         $output->write("<comment>Opening asterisk connection... </comment>");
         try {
             $pamiClient->open();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed opening asterisk connection');
 
             throw new \Exception($e->getMessage());
