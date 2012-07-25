@@ -20,6 +20,7 @@ use PAMI\Message\Event\EventMessage;
 use PhpAmqpLib\Connection\AMQPConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 
+
 /**
  * @author Richard Fullmer <richard.fullmer@opensoftdev.com>
  */
@@ -29,10 +30,18 @@ class ListenCommand extends Command
      * {@inheritdoc}
      */
     protected function configure()
-    {
+    {        
         $log4phpPath = is_file(__DIR__.'/../../../log4php.xml')
             ? realpath(__DIR__.'/../../../log4php.xml')
             : realpath(__DIR__.'/../../../log4php.dist.xml');
+
+        $configFile  = __DIR__ . '/Resources/Config/settings.ini';
+
+        if(!file_exists($configFile)) {
+            throw new \Exception('Configuration file ( ' . $configFile . ') is missing!');
+        }
+
+        $optionDefaults = parse_ini_file($configFile, true);
 
         $this
             ->setName('listen')
@@ -40,29 +49,25 @@ class ListenCommand extends Command
 
             ->addOption('log4php-configuration', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', $log4phpPath)
 
-            ->addOption('ami-host', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', 'localhost')
-            ->addOption('ami-port', null, InputOption::VALUE_OPTIONAL, 'Asterisk port', 5038)
-            ->addOption('ami-username', null, InputOption::VALUE_OPTIONAL, 'Asterisk username', 'admin')
-            ->addOption('ami-password', null, InputOption::VALUE_OPTIONAL, 'Asterisk secret', 'mysecret')
-            ->addOption('ami-connect-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk connect timeout', 10000)
-            ->addOption('ami-read-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk read timeout', 10000)
+            ->addOption('ami-host', null, InputOption::VALUE_OPTIONAL, 'Asterisk host', $optionDefaults['asterisk']['ami-host'])
+            ->addOption('ami-port', null, InputOption::VALUE_OPTIONAL, 'Asterisk port', (int) $optionDefaults['asterisk']['ami-port'])
+            ->addOption('ami-username', null, InputOption::VALUE_OPTIONAL, 'Asterisk username', $optionDefaults['asterisk']['ami-username'])
+            ->addOption('ami-password', null, InputOption::VALUE_OPTIONAL, 'Asterisk secret', $optionDefaults['asterisk']['ami-password'])
+            ->addOption('ami-connect-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk connect timeout', (int) $optionDefaults['asterisk']['ami-connect-timeout'])
+            ->addOption('ami-read-timeout', null, InputOption::VALUE_OPTIONAL, 'Asterisk read timeout', (int) $optionDefaults['asterisk']['ami-read-timeout'])
 
+            ->addOption('rabbit-host', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ host', $optionDefaults['rabbitmq']['rabbit-host'])
+            ->addOption('rabbit-port', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ port', (int) $optionDefaults['rabbitmq']['rabbit-port'])
+            ->addOption('rabbit-username', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ username', $optionDefaults['rabbitmq']['rabbit-username'])
+            ->addOption('rabbit-password', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ password', $optionDefaults['rabbitmq']['rabbit-password'])
+            ->addOption('rabbit-vhost', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ vhost', $optionDefaults['rabbitmq']['rabbit-vhost'])
 
-            ->addOption('rabbit-host', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ host', 'localhost')
-            ->addOption('rabbit-port', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ port', 5672)
-            ->addOption('rabbit-username', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ username', 'guest')
-            ->addOption('rabbit-password', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ password', 'guest')
-            ->addOption('rabbit-vhost', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ vhost', '/')
+            ->addOption('rabbit-exchange-name', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ exchange name', $optionDefaults['rabbitmq']['rabbit-exchange-name'])
 
+            ->addOption('mailer', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Swift Mailer Options', $optionDefaults['mailer'])
+            ->addOption('notify', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'List of people to notify on errors', $optionDefaults['reporting'])
 
-            ->addOption('rabbit-exchange-name', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ exchange name', 'asterbunny.events')
-
-            ->setHelp(<<<EOF
-
-The <info>listen</info> command listens to a configured Asterisk server.
-
-EOF
-        );
+        ->setHelp("The <info>listen</info> command listens to a configured Asterisk server.");
     }
 
     /**
@@ -84,30 +89,42 @@ EOF
         $pamiClient = new ClientImpl($pamiClientOptions);
 
         $output->write("<comment>Opening asterisk connection... </comment>");
-        $pamiClient->open();
+        try {
+            $pamiClient->open();
+        } catch (\Exception $e) {
+            $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed opening asterisk connection');
+
+            throw new \Exception($e->getMessage());
+        }
         $output->writeln('<info>done</info>');
 
 
         $output->write("<comment>Opening rabbitmq connection... </comment>");
-        $amqpConn = new AMQPConnection(
-            $input->getOption('rabbit-host'),
-            $input->getOption('rabbit-port'),
-            $input->getOption('rabbit-username'),
-            $input->getOption('rabbit-password'),
-            $input->getOption('rabbit-vhost')
-        );
-        $ch = $amqpConn->channel();
-        $exchange = $input->getOption('rabbit-exchange-name');
-        $ch->exchange_declare($exchange, 'fanout', false, true, false);
 
-        $output->writeln('<info>done</info>');
+        try {
+            $amqpConn = new AMQPConnection(
+                $input->getOption('rabbit-host'),
+                $input->getOption('rabbit-port'),
+                $input->getOption('rabbit-username'),
+                $input->getOption('rabbit-password'),
+                $input->getOption('rabbit-vhost')
+            );
+            $ch = $amqpConn->channel();
+            $exchange = $input->getOption('rabbit-exchange-name');
+            $ch->exchange_declare($exchange, 'fanout', false, true, false);
+    
+            $output->writeln('<info>done</info>');
+        } catch (\Exception $e) {
+            $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed opening rabbitmq connection');
+            
+            throw new \Exception($e->getMessage());
+        }
 
         $i = 0;
         $counter = 0;
 
         $pamiClient->registerEventListener(function(EventMessage $event) use ($output, $ch, $exchange, &$counter, &$i) {
             // Send to RabbitMQ
-
             $msg = new AMQPMessage(
                 json_encode($event->getKeys()),
                 array(
@@ -182,6 +199,9 @@ EOF
 
                     // try to close any connections
                     $closer(false);
+                    
+                    // send notification...
+                    $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed reading from asterisk server');
 
                     // rethrow the exception
                     throw $e;
@@ -193,4 +213,24 @@ EOF
 
         return 0;
     }
+    
+    protected function sendNotification(array $swiftOptions, array $notifyList, \Exception $exception, $message = null)
+    {
+        $transport = \Swift_SmtpTransport::newInstance($swiftOptions['smtp-host'], (int) $swiftOptions['smtp-port'])
+            ->setUsername($swiftOptions['smtp-username'])
+            ->setPassword($swiftOptions['smtp-password']);
+
+        $mailer = \Swift_Mailer::newInstance($transport);
+        
+        foreach ($notifyList as $person => $email)
+        {
+            $message = \Swift_Message::newInstance()
+                ->setSubject('Errors from Asterbunny')
+                ->setFrom($swiftOptions['no-reply'])
+                ->setTo($email)
+                ->setBody("Asterbunny has failed. Message: \n\r" . $message . "\n\rException: " . $exception->getMessage());
+            $mailer->send($message);
+        }
+    }
+
 }

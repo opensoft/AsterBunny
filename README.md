@@ -25,11 +25,23 @@ Usage
 The CLI tool is located at `bin/asterbunny` and has a lot of configuration options relating to specifying hostnames, ports,
 usernames, and passwords for Asterisk connections and RabbitMQ servers.
 
-It's recommended to run the following to learn the configuration set, and defaults
+It's recommended to run the following to learn the configuration set:
 
 ```bash
 ./bin/asterbunny listen --help
 ```
+
+The file src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist holds all the default values for configuration.
+
+Create a copy of the file
+
+```bash
+cp src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist src/Opensoft/AsterBunny/Resources/Config/settings.ini
+```
+
+And edit the newly created settings.ini file accordingly.
+
+It is also recommended that you create a username and password in Gmail for the application instance. If you would prefer to host your own smtp server, then change the host, username, password, and port parameters in the configuration file.
 
 Message Sending
 ===============

@@ -41,7 +41,8 @@
         "php": ">=5.3.0",
         "symfony/console": "dev-master",
         "videlalvaro/php-amqplib": "dev-master",
-        "marcelog/pami": "dev-master"
+        "marcelog/pami": "dev-master",
+        "symfony/swiftmailer-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": {
