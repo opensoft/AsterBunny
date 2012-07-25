@@ -1,0 +1,7 @@
+swiftmailer:
+    transport:  gmail
+    encryption: ssl
+    auth_mode:  login
+    host:       smtp.gmail.com
+    username:   app_username
+    password:   app_password
