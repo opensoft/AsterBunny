@@ -5,7 +5,7 @@
             "package": "marcelog/pami",
             "version": "dev-master",
             "source-reference": "master",
-            "commit-date": "1340976964"
+            "commit-date": "1337787695"
         },
         {
             "package": "pear-log4php/Apache_log4php",
@@ -22,6 +22,12 @@
             "version": "dev-master",
             "source-reference": "8b2aa953f87da228ba413e8fb1372e49c1374050",
             "commit-date": "1342198037"
+        },
+        {
+            "package": "symfony/console",
+            "version": "dev-master",
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
         },
         {
             "package": "symfony/console",

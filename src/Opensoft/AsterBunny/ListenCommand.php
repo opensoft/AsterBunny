@@ -10,6 +10,7 @@
 
 namespace Opensoft\AsterBunny;
 
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -64,6 +65,7 @@ class ListenCommand extends Command
 
             ->addOption('rabbit-exchange-name', null, InputOption::VALUE_OPTIONAL, 'RabbitMQ exchange name', $optionDefaults['rabbitmq']['rabbit-exchange-name'])
 
+            ->addOption('mailer', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Swift Mailer Options', $optionDefaults['mailer'])
             ->addOption('notify', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'List of people to notify on errors', $optionDefaults['reporting'])
 
         ->setHelp("The <info>listen</info> command listens to a configured Asterisk server.");
@@ -91,7 +93,7 @@ class ListenCommand extends Command
         try {
             $pamiClient->open();
         } catch(\Exception $e) {
-            $this->sendNotification($input->getOption('notify'), $e, 'Failed opening asterisk connection');
+            $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed opening asterisk connection');
 
             throw new \Exception($e->getMessage());
         }
@@ -114,7 +116,7 @@ class ListenCommand extends Command
     
             $output->writeln('<info>done</info>');
         } catch (\Exception $e) {
-            $this->sendNotification($input->getOption('notify'), $e, 'Failed opening rabbitmq connection');
+            $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed opening rabbitmq connection');
             
             throw new \Exception($e->getMessage());
         }
@@ -200,7 +202,7 @@ class ListenCommand extends Command
                     $closer(false);
                     
                     // send notification...
-                    $this->sendNotification($input->getOption('notify'), $e, 'Failed reading from asterisk server');
+                    $this->sendNotification($input->getOption('mailer'), $input->getOption('notify'), $e, 'Failed reading from asterisk server');
 
                     // rethrow the exception
                     throw $e;
@@ -213,16 +215,22 @@ class ListenCommand extends Command
         return 0;
     }
     
-    protected function sendNotification(array $notifyList, \Exception $exception, $message = null)
+    protected function sendNotification(array $swiftOptions, array $notifyList, \Exception $exception, $message = null)
     {
-        $noReply = array_shift($notifyList);
+        $transport = \Swift_SmtpTransport::newInstance($swiftOptions['smtp-host'], (int) $swiftOptions['smtp-port'])
+            ->setUsername($swiftOptions['smtp-username'])
+            ->setPassword($swiftOptions['smtp-password']);
+
+        $mailer = \Swift_Mailer::newInstance($transport);
+        
         foreach ($notifyList as $person => $email)
         {
             $message = \Swift_Message::newInstance()
                 ->setSubject('Errors from Asterbunny')
-                ->setFrom($noReply)
+                ->setFrom($swiftOptions['no-reply'])
                 ->setTo($email)
-                ->setBody('Asterbunny has failed. Message: ' . PHP_EOL . $message . PHP_EOL . 'Exception: ' . $exception->getMessage());
+                ->setBody("Asterbunny has failed. Message: \n\r" . $message . "\n\rException: " . $exception->getMessage());
+            $mailer->send($message);
         }
     }
 
