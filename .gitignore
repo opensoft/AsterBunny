@@ -1,3 +1,4 @@
 vendor/
 composer.phar
 log4php.xml
+src/Opensoft/AsterBunny/Resources/Config/settings.ini

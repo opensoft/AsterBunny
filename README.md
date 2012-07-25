@@ -31,9 +31,13 @@ It's recommended to run the following to learn the configuration set:
 ./bin/asterbunny listen --help
 ```
 
-A file located in src/Opensoft/AsterBunny/Resources/Config holds all the default values for configuration.
+The file src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist holds all the default values for configuration.
 
-It is also recommended that all defaults be put in this file, and the file be added to your .gitignore file. The file MUST exist for the application to function.
+Create a copy of the file
+
+```cp src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist src/Opensoft/AsterBunny/Resources/Config/settings.ini```
+
+And edit the newly created settings.ini file accordingly.
 
 It is also recommended that you create a username and password in Gmail for the application instance. If you would prefer to host your own smtp server, then change the host, username, password, and port parameters in the configuration file.
 
