@@ -1,31 +1,63 @@
 {
-    "hash": "37e881d3487ed78e0bb56d6c25d9173a",
+    "hash": "028e7c225c71106e83130534b48db4b2",
     "packages": [
         {
             "package": "marcelog/pami",
             "version": "dev-master",
-            "source-reference": "master"
+            "source-reference": "master",
+            "commit-date": "1340976964"
         },
         {
             "package": "pear-log4php/Apache_log4php",
             "version": "2.2.1"
         },
         {
-            "package": "symfony/console",
+            "package": "swiftmailer/swiftmailer",
             "version": "dev-master",
-            "source-reference": "ec3d45fafea157507b7dce339ce5a7c29de7642d"
+            "alias-pretty-version": "4.2.x-dev",
+            "alias-version": "4.2.9999999.9999999-dev"
+        },
+        {
+            "package": "swiftmailer/swiftmailer",
+            "version": "dev-master",
+            "source-reference": "8b2aa953f87da228ba413e8fb1372e49c1374050",
+            "commit-date": "1342198037"
         },
         {
             "package": "symfony/console",
             "version": "dev-master",
-            "source-reference": "ec3d45fafea157507b7dce339ce5a7c29de7642d",
+            "source-reference": "v2.1.0-BETA4",
+            "commit-date": "1342347231"
+        },
+        {
+            "package": "symfony/swiftmailer-bridge",
+            "version": "dev-master",
             "alias-pretty-version": "2.1.x-dev",
             "alias-version": "2.1.9999999.9999999-dev"
         },
         {
+            "package": "symfony/swiftmailer-bridge",
+            "version": "dev-master",
+            "source-reference": "v2.1.0-BETA4",
+            "commit-date": "1342347231"
+        },
+        {
+            "package": "symfony/swiftmailer-bundle",
+            "version": "dev-master",
+            "alias-pretty-version": "2.1.x-dev",
+            "alias-version": "2.1.9999999.9999999-dev"
+        },
+        {
+            "package": "symfony/swiftmailer-bundle",
+            "version": "dev-master",
+            "source-reference": "v2.1.0-BETA4",
+            "commit-date": "1342684512"
+        },
+        {
             "package": "videlalvaro/php-amqplib",
             "version": "dev-master",
-            "source-reference": "d4fb5348f2118e9fbc00aa7461e3bad79bf42d6c"
+            "source-reference": "5772542542bd061d023fe4266dda74db7ee43144",
+            "commit-date": "1342427648"
         }
     ],
     "packages-dev": null,
@@ -36,6 +68,7 @@
     "stability-flags": {
         "symfony/console": 20,
         "videlalvaro/php-amqplib": 20,
-        "marcelog/pami": 20
+        "marcelog/pami": 20,
+        "symfony/swiftmailer-bundle": 20
     }
 }
