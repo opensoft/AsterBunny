@@ -35,7 +35,9 @@ The file src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist holds all th
 
 Create a copy of the file
 
-```cp src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist src/Opensoft/AsterBunny/Resources/Config/settings.ini```
+```bash
+cp src/Opensoft/AsterBunny/Resources/Config/settings.ini.dist src/Opensoft/AsterBunny/Resources/Config/settings.ini
+```
 
 And edit the newly created settings.ini file accordingly.
 
