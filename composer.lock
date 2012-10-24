@@ -1,82 +1,110 @@
 {
-    "hash": "37e881d3487ed78e0bb56d6c25d9173a",
+    "hash": "8013d25c4b185aeb01f0d10b6196ee08",
     "packages": [
         {
             "name": "marcelog/pami",
-            "version": "dev-master",
+            "version": "1.70.0",
             "source": {
                 "type": "git",
-                "url": "git://github.com/marcelog/PAMI.git",
-                "reference": "master"
+                "url": "git@github.com:marcelog/PAMI",
+                "reference": "1.70.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/macerlog/PAMI/zipball/master",
-                "reference": null,
-                "shasum": null
+                "url": "https://github.com/marcelog/PAMI/zipball/1.70.0",
+                "reference": "1.70.0",
+                "shasum": ""
             },
             "require": {
+                "php": ">=5.3.3",
                 "pear-log4php/apache_log4php": ">=2.1.0"
             },
+            "time": "2012-09-02 16:47:06",
             "type": "library",
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
-                    "PAMI": "src/mg/"
+                    "PAMI": "src/mg"
                 }
             },
-            "time": "1335824177"
+            "license": [
+                "Apache2"
+            ],
+            "authors": [
+                {
+                    "name": "Marcelo Gornstein",
+                    "email": "marcelog@gmail.com",
+                    "homepage": "http://marcelog.github.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Asterisk Manager Interface (AMI) client for PHP, event driven, object oriented",
+            "homepage": "http://marcelog.github.com/PAMI",
+            "keywords": [
+                "event",
+                "client",
+                "manager",
+                "monitor",
+                "asterisk",
+                "ami",
+                "voip",
+                "telephony",
+                "action"
+            ]
         },
         {
-            "name": "pear-log4php/Apache_log4php",
-            "version": "2.2.1",
+            "name": "pear-pear.apache.org/log4php/Apache_log4php",
+            "version": "2.3.0",
             "dist": {
-                "type": "pear",
-                "url": "http://pear.apache.org/log4php/get/Apache_log4php-2.2.1.tgz",
+                "type": "file",
+                "url": "http://pear.apache.org/log4php/get/Apache_log4php-2.3.0.tgz",
                 "reference": null,
                 "shasum": null
             },
             "require": {
-                "php": ">=5.2.0"
+                "php": ">=5.2.0.0"
             },
-            "type": "library",
+            "replace": {
+                "pear-log4php/apache_log4php": "== 2.3.0.0"
+            },
+            "type": "pear-library",
             "installation-source": "dist",
             "autoload": {
                 "classmap": [
                     ""
                 ]
             },
-            "license": [
-                "Apache License 2.0"
+            "include-path": [
+                "/"
             ],
             "description": "Apache log4php is a versatile logging framework for PHP at the Apache Software Foundation (ASF)."
         },
         {
             "name": "symfony/console",
-            "version": "dev-master",
+            "version": "v2.1.2",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "ec3d45fafea157507b7dce339ce5a7c29de7642d"
+                "reference": "v2.1.0-RC2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/zipball/ec3d45fafea157507b7dce339ce5a7c29de7642d",
-                "reference": "ec3d45fafea157507b7dce339ce5a7c29de7642d",
+                "url": "https://github.com/symfony/Console/zipball/v2.1.0-RC2",
+                "reference": "v2.1.0-RC2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1336752887",
+            "time": "2012-08-22 06:48:41",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-master": "2.1-dev"
                 }
             },
-            "installation-source": "source",
+            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Console": ""
@@ -88,15 +116,11 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com",
-                    "homepage": null,
-                    "role": null
+                    "email": "fabien@symfony.com"
                 },
                 {
                     "name": "Symfony Community",
-                    "email": null,
-                    "homepage": "http://symfony.com/contributors",
-                    "role": null
+                    "homepage": "http://symfony.com/contributors"
                 }
             ],
             "description": "Symfony Console Component",
@@ -108,18 +132,18 @@
             "source": {
                 "type": "git",
                 "url": "git://github.com/videlalvaro/php-amqplib.git",
-                "reference": "d4fb5348f2118e9fbc00aa7461e3bad79bf42d6c"
+                "reference": "85ff1412152e2de8519dc75ffb741fe3adf89b9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/videlalvaro/php-amqplib/zipball/d4fb5348f2118e9fbc00aa7461e3bad79bf42d6c",
-                "reference": "d4fb5348f2118e9fbc00aa7461e3bad79bf42d6c",
+                "url": "https://github.com/videlalvaro/php-amqplib/zipball/85ff1412152e2de8519dc75ffb741fe3adf89b9c",
+                "reference": "85ff1412152e2de8519dc75ffb741fe3adf89b9c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "1336662843",
+            "time": "1350881455",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -129,10 +153,7 @@
             },
             "authors": [
                 {
-                    "name": "Alvaro Videla",
-                    "email": null,
-                    "homepage": null,
-                    "role": null
+                    "name": "Alvaro Videla"
                 }
             ],
             "description": "This library is a pure PHP implementation of the AMQP protocol. It's been tested against RabbitMQ.",
@@ -150,8 +171,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "symfony/console": 20,
-        "videlalvaro/php-amqplib": 20,
-        "marcelog/pami": 20
+        "videlalvaro/php-amqplib": 20
     }
 }
